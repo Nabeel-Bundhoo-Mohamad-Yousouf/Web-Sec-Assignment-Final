@@ -2,52 +2,64 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Book;
 use App\Models\Review;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 
 class ReviewController extends Controller
 {
-    public function create(Book $book)
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
     {
-        // Check if the logged-in user actually owns/rented this book
-        $hasInteracted = auth()->user()->rentedBooks()->where('book_id', $book->id)->exists();
-        
-        if (!$hasInteracted) {
-           return redirect()->route('books.show', $book->id)
-                         ->with('error', 'You must purchase or rent this book before leaving a review.');
-    } 
-        return view('reviews.create', compact('book'));
+        //
     }
 
-    public function store(Request $request, Book $book)
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
     {
-        $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'required|string|min:10',
-        ]);
-
-        Review::create([
-            'book_id' => $book->id,
-            'user_id' => auth()->id(), // Automatically grabs the logged-in user
-            'rating' => $request->rating,
-            'comment' => $request->comment,
-        ]);
-
-        return redirect()->route('books.show', $book->id)
-                         ->with('success', 'Your review has been posted!');
+        //
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Review $review)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Review $review)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Review $review)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(Review $review)
     {
-    // SECURITY CHECK: Only allow the owner to delete their own review
-        if (auth()->id() !== $review->user_id) {
-         abort(403, 'Unauthorized action.');
-         }
-
-        $review->delete();
-
-        return back()->with('success', 'Review deleted successfully!');
+        //
     }
 }

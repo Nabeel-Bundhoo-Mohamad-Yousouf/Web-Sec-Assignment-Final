@@ -1,124 +1,181 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ $book->title }} Preview
-        </h2>
-    </x-slot>
+@extends("layout.default")
 
-    <div class="py-12 max-w-7xl mx-auto sm:px-6 lg:px-8">
-        
-        <div class="bg-white p-6 rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-12 gap-8">
-            
-            <div class="md:col-span-4 flex flex-col items-center">
-                <img class="rounded-lg shadow-md w-full object-cover max-w-sm" 
-                    src="{{ asset('images/' . ($book->img_url ?? 'default_book.png')) }}"
-                    alt="{{ $book->title }} by {{ $book->author }}" />
+@section("main_content")
+    <div class="container-fluid preview_container">
+        <p class="preview-title">Preview</p>
+        <div class="row justify-content-center preview_grid">
 
-                <div class="mt-6 w-full max-w-sm">
-                    <div class="text-center mb-4 text-lg font-semibold text-gray-700 bg-gray-50 py-2 rounded border border-gray-100">
-                        Rental Fee: Rs {{ $book->rental_fee }}
-                    </div>
-                    
-                    @auth
-                    <form action="{{ route('books.borrow') }}" method="post">
-                        @csrf
-                        <input type="hidden" name="id" value="{{$book->id}}">
-                        <button type="submit" class="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-4 rounded transition duration-150">
-                            Borrow Book
+            <!-- Image + Buttons -->
+            <div class="col-lg-5 col-md-6 col-sm-12 flex-column align-items-center ">
+
+                <img class="card-img-top img-responsive rounded book-card__image" 
+                    src="{{ asset ('images/' . ($book->img_url ?? 'default_book.png')) }}"
+                    alt="{{ $book->title}} by {{ $book->author}}"
+                />
+
+                <!--Display buy and rental fees-->
+                <div class="btn-tabs-container pt-3 justify-content-start">
+                    <div class="btn-tabs" id="tab-btn" role="tablist">
+
+                        <!-- Buy Tab -->
+                        <button type="button" class="tab_btn active" id="buy_tab"
+                            data-bs-toggle="tab" data-bs-target="#buy" role="tab"
+                            aria-controls="buy" aria-selected="true">
+                            <span style=" font-weight: var(--font-weight-normal);">Buy </span>
+                            &nbsp;
+                            <span class="book-card__price">Rs {{ $book->price}} </span>
                         </button>
-                    </form>
-                    @else
-                        <a href="{{ route('login') }}" class="block text-center w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded transition duration-150">
-                            Login to Borrow
-                        </a>
-                    @endauth
+
+                        <!-- Rent Tab -->
+                        <button type="button" class="tab_btn" id="borrow_tab"
+                            data-bs-toggle="tab" data-bs-target="#borrow" role="tab"
+                            aria-controls="borrow" aria-selected="false">
+                            <span style=" font-weight: var(--font-weight-normal);">Rent </span>
+                            &nbsp;
+                            <span class="book-card__price_borrow">Rs {{$book->rental_fee}} </span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab_content">
+                    <!-- Buy Content -->
+                    <div class="tab-pane fade show active p-3" id="buy" role="tabpanel"
+                        aria-labelledby="buy_tab">
+
+                        <!--Submits book to cart to buy only if user is logged in-->
+                        @if (session()-> has("logged_in"))
+                        <form action="#" method="post">
+                            @csrf
+                            <input type="hidden" name="id" value="{{$book->book_id}}">
+                            <input type="hidden" name="title" value="{{$book->title}}">
+                            <input type="hidden" name="price" value="{{$book->price}}">
+                            <input type="hidden" name="image" value="{{$book->img_url}}">
+                            <input type="hidden" name="author" value="{{$book->author}}">
+                            <input type="hidden" name="rent_or_buy" value="buy">
+                            <input type="hidden" name="qty" value="1">
+                            <button type="submit" class="button add_to_cart_btn w-70 align-center">
+                                + Add to cart
+                            </button>
+                        </form>
+                        @else
+                            <a href="#" class="btn primary_btn">
+                                <i class="bi bi-cart-plus icons"> + Add to cart </i>
+                            </a>
+                        @endif
+                    </div>
+
+                    <!-- Rent Content -->
+                    <div class="tab-pane fade p-3" id="borrow" role="tabpanel"
+                        aria-labelledby="borrow_tab">
+
+                        <!--Submits book to cart to rent only if user is logged in-->
+                        @if (session()-> has("logged_in"))
+                        <form action="#" method="post">
+                            @csrf
+                            <input type="hidden" name="id" value="{{$book->id}}">
+                            <input type="hidden" name="title" value="{{$book->title}}">
+                            <input type="hidden" name="price" value="{{$book->price}}">
+                            <input type="hidden" name="image" value="{{$book->img_url}}">
+                            <input type="hidden" name="author" value="{{$book->author}}">
+                            <input type="hidden" name="rent_or_buy" value="rent">
+                            <input type="hidden" name="qty" value="1">
+                            <button type="submit" class="button add_to_cart_btn w-70 align-center">
+                                + Add to cart
+                            </button>
+                        </form>
+                        @else
+                            <a href="#" class="btn primary_btn">
+                                <i class="bi bi-cart-plus icons"> + Add to cart </i>
+                            </a>
+                        @endif
+
+                    </div>
                 </div>
             </div>
 
-            <div class="md:col-span-8 flex flex-col justify-center">
-                <h1 class="text-3xl font-bold text-gray-900">{{ $book->title }}</h1>
-                <p class="text-lg text-gray-600 mt-1">By {{ $book->author ?? 'Unknown Author' }}</p>
+            <!-- Book Info -->
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <p class="preview-card__title">{{ $book->title}}</p>
+                <p class="preview-card__author">By {{ $book->author}}</p>
 
-                <div class="flex items-center mt-4 mb-6">
-                    @php $rating = round($book->reviews_avg_rating ?? 0); @endphp
-                    <div class="flex text-yellow-400 text-xl">
-                        @for ($i = 1; $i <= 5; $i++)
-                            @if ($i <= $rating)
-                                <span>&#9733;</span>
-                            @else
-                                <span class="text-gray-200">&#9733;</span>
-                            @endif
-                        @endfor
-                    </div>
-                    <span class="ml-3 text-gray-500 font-medium">({{ number_format($book->reviews_avg_rating ?? 0, 1) }} out of 5)</span>
+                <!--Star ratings-->
+                <div class="star-rating">
+                    @php
+                        $star_rating = round($book->reviews_avg_rating ?? 0);
+                    @endphp
+                    
+                    @for ($i=1; $i<= 5; $i++)
+                        <span>
+                            {{$i <= $star_rating ? '★' : '☆'}}
+                        </span>
+                    @endfor
+                    <span style="color: var(--text-primary);"> {{$book->reviews_avg_rating}}</span>
                 </div>
                 
-                <div class="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-line">
-                    {{ $book->description }}
-                </div>
+                <p class="preview-card__description">
+                    {{$book->book_description}}
+                </p>
             </div>
         </div>
+    </div>
 
-        <div class="mt-12">
-            <div class="flex justify-between items-end mb-6 border-b border-gray-200 pb-4">
-                <h2 class="text-2xl font-bold text-gray-900">Customer Reviews</h2>
-                <span class="text-gray-500 font-medium">Showing {{ $book->reviews->count() }} reviews</span>
-            </div>
+    <!--Customer Reviews-->
+    <div class="container-fluid preview_container align-items-center pt-3 py-5">
+        <hr class="footer_divider">
 
-            @auth
-                <a href="{{ route('reviews.create', $book->id) }}" 
-                    class="bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold py-2 px-4 rounded-lg transition duration-150">
-                     + Write a Review
-                 </a>
-             @endauth
+        <!--Reviews Header-->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0 preview-title">Customer Reviews</h4>
+
+            <!-- Write Review btn -->
+            <a href="#" class="btn primary_btn review_btn"> Write a review </a>
         </div>
 
-            <div class="space-y-6">
-                @forelse ($book->reviews as $review)
-                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h4 class="font-bold text-gray-900 text-lg">{{ $review->user->name ?? "Anonymous" }}</h4>
-                                <span class="text-sm text-gray-500">{{ $review->created_at->format('M d, Y') }}</span>
-                            </div>
-                            <div class="flex text-yellow-400">
-                                @for ($i = 1; $i <= 5; $i++)
-                                    @if ($i <= $review->rating)
-                                        <span>&#9733;</span>
-                                    @else
-                                        <span class="text-gray-200">&#9733;</span>
-                                    @endif
-                                @endfor
-                            </div>
+        <!--User review cards-->
+        <div id="carousel_controls" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner pt-3 pb-3">
+
+                @forelse ($book-> reviews as $review)
+                <!--Review Card-->
+                <div class="carousel-item active">
+                     <div class="review-card mx-auto">
+
+                        <!--User star ratings-->
+                        <div class="star-rating">
+                            @php
+                                $star_rating = floor($review->rating);
+                            @endphp
+                            
+                            @for ($i=1; $i<= 5; $i++)
+                                <span>
+                                    {{$i <= $star_rating ? '★' : '☆'}}
+                                </span>
+                            @endfor
                         </div>
 
-                        <p class="text-gray-700 text-base leading-relaxed">
-                            {{ $review->comment }}
+                        <!--Review card body-->
+                        <p style="font-weight: 600; margin-bottom: 5px; color: #777;">
+                            Print "customer_name" " • " "date"
                         </p>
-
-                        @auth
-                            @if(auth()->id() === $review->user_id)
-                                <div class="mt-4 pt-4 border-t border-gray-50 flex justify-end">
-                                    <form action="{{ route('reviews.destroy', $review->id) }}" method="post">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-semibold transition duration-150"
-                                            onclick="return confirm('Do you want to delete this review?')">
-                                            Delete Review
-                                        </button>
-                                    </form>
-                                </div>
-                            @endif
-                        @endauth
+                        <p class="review-title">{{ $review->title}}</p>
+                        <p class="review-text truncate_multi_line">
+                            {{ $review->review_description}}
+                        </p>
                     </div>
+                </div>
                 @empty
-                    <div class="bg-gray-50 p-8 rounded-lg text-center border border-dashed border-gray-300">
-                        <p class="text-gray-500 text-lg">No reviews yet.</p>
-                        <p class="text-gray-400 text-sm mt-1">Be the first to review this book after borrowing it!</p>
-                    </div>
+                    <h4 class="mb-3 text-muted">No reviews yet.</h4>
                 @endforelse
             </div>
+
+            <!--Carousel Controls-->
+            <button type="btn" class="carousel-control-prev" data-bs-target="#carousel_controls" role="btn" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </btn>
+            <button type="btn" class="carousel-control-next" data-bs-target="#carousel_controls" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </btn>
         </div>
-        
     </div>
-</x-app-layout>
+
+@endsection

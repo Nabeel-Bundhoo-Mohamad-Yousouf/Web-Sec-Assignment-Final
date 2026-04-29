@@ -1,13 +1,8 @@
-<?php
+ <?php
 
-use App\Http\Controllers\Api\BookApiController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\BookController;
 
-// Public API: Anyone can see the book list
-Route::get('/books', [BookApiController::class, 'index']);
-Route::get('/books/{id}', [BookApiController::class, 'show']);
-
-// Protected API: Only "Urshita" with a Token can post reviews
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/books/{id}/reviews', [BookApiController::class, 'storeReview']);
-});
+Route::get('/api/books/search', [BookController::class, 'search'])
+    ->name('api.books.search');
