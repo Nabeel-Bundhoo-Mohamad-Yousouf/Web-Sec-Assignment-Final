@@ -62,7 +62,7 @@
         <div class="mt-12">
             <div class="flex justify-between items-end mb-6 border-b border-gray-200 pb-4">
                 <h2 class="text-2xl font-bold text-gray-900">Customer Reviews</h2>
-                <span class="text-gray-500 font-medium">Showing {{ $book->reviews->count() }} reviews</span>
+                <span class="text-gray-500 font-medium">Showing {{ $reviews->count() }} of {{ $reviews->total() }} reviews</span>
             </div>
 
             @auth
@@ -74,7 +74,7 @@
         </div>
 
             <div class="space-y-6">
-                @forelse ($book->reviews as $review)
+                @forelse ($reviews as $review)
                     <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                         <div class="flex justify-between items-start mb-4">
                             <div>
@@ -118,6 +118,11 @@
                     </div>
                 @endforelse
             </div>
+            
+            <div class="mt-8">
+            {{ $reviews->links() }}
+            </div>
+
         </div>
         
     </div>
