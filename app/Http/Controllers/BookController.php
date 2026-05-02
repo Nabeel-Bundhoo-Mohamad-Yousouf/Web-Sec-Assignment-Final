@@ -31,14 +31,16 @@ class BookController extends Controller
     }
 
     // 2. NEW: The missing show method to handle book details
+// 2. UPDATED: The show method to handle book details WITH Paginated Reviews
     public function show(Book $book) {
-        // Load the reviews and the users who wrote them
-        // Also calculate average rating and sum for the details page
-        $book->load(['reviews.user'])
-             ->loadAvg('reviews', 'rating')
-             ->loadSum('reviews', 'rating');
+        // Calculate average rating for the book details
+        $book->loadAvg('reviews', 'rating');
 
-        return view('book_details', compact('book'));
+        // Fetch the reviews separately and paginate them (2 per page)
+        $reviews = $book->reviews()->with('user')->latest()->paginate(2);
+
+        // Pass BOTH the book and the paginated reviews to the view
+        return view('book_details', compact('book', 'reviews'));
     }
 
     // 3. Borrow logic
